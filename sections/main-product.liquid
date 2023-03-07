@@ -61,7 +61,7 @@
 <div class="product-images-carousel">
   <div class="product-images-slider">
     <div class="product-image-item">
-      <img src="{{ img_url | replace: '{width}', '300' | replace: '{height}', '300' }}" alt="{{ image.alt | escape }}" />
+      <img src="{{ img_url | replace: '{width}', '1000' | replace: '{height}', '1000' }}" alt="{{ image.alt | escape }}" }} />
     </div>
     {% for image in product.images %}
      {% assign img_url = featured_image | img_url: 'master' %}
