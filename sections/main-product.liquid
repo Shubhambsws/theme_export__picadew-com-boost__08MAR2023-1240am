@@ -641,9 +641,11 @@
   {% endunless %}
 </div>
 
-{%- assign current_variant = product.selected_or_first_available_variant -%}
-{% render 'structured-data-product', product: product, current_variant: current_variant %}
-
+{% if variant.image %}
+  {{- assign img_url = variant.image.src -}}
+{% elsif product.images.size > 0 %}
+  {{- assign img_url = product.images[0] | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -}}
+{% endif %}}
 {% schema %}
   {
     "name": "Product details",
