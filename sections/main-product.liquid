@@ -22,32 +22,28 @@
         <div class="product-layout-grid__images layout--{{ section.settings.media_layout }}{% if product.media.size > 1 %} has-multiple-images{% endif %}" data-product-image-layout="{{ section.settings.media_layout | split: '-' | first }}">
           <div class="product-layout-grid__images-and-thumbs {% if section.settings.enable_sticky_media %} sticky-element{% endif %}">
             <div class="product-detail__images-container">
-              {% if product.media.size > 0 %}
-                <div class="product-detail__images" data-featured-media-id="{{ featured_media.id }}">
-                  {% for media in product.media %}
-                    <div class="product-detail__image">
-                      {%- if media.media_type == 'image' -%}
-                        <a href="{{ media.preview_image.src | img_url: 'master' }}"
-                          data-product-image
-                          data-product-media
-                          data-media-id="{{ media.id }}"
-                          data-image-w="{{ media.preview_image.width }}"
-                          data-image-h="{{ media.preview_image.height }}"
-                          class="global-border-radius">
-                      {%- else -%}
-                        <div class="global-border-radius" data-product-media data-media-id="{{ media.id }}">
-                      {%- endif -%}
-
+              {% if product.images.size > 1 %}
+  <div class="product-images">
+    <div class="product-images-carousel">
+      {% for image in product.images %}
+        <div class="product-image">
+          <a href="{{ image.src | img_url: '1024x1024' }}" data-fancybox="product-gallery" data-caption="{{ image.alt | escape }}">
+            <img src="{{ image.src | img_url: 'grande' }}" alt="{{ image.alt | escape }}" />
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+                  
 {% assign current_variant = product.selected_or_first_available_variant %}
 {% assign featured_image = current_variant.featured_image | default: product.featured_image %}
 {% assign img_url = featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
-
-                        {% endfor %}
+{% endfor %}
     {% endif %}
   {% endfor %}
 {% endunless %}
 
-                    </div>
                   {% endfor %}
                 </div>
               {% else %}
