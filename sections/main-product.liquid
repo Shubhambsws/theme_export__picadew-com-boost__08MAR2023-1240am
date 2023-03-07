@@ -38,9 +38,10 @@
                         <div class="global-border-radius" data-product-media data-media-id="{{ media.id }}">
                       {%- endif -%}
 
-                      {%- render 'media', media: media -%}
+{% assign current_variant = product.selected_or_first_available_variant %}
+{% assign featured_image = current_variant.featured_image | default: product.featured_image %}
+{% assign img_url = featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
 
-                      {%- unless media.media_type == 'image' -%}
                         </div>
                       {%- else -%}
                         </a>
@@ -51,7 +52,40 @@
               {% else %}
                 {% render 'media' with featured_media %}
               {% endif %}
-
+{% assign img_width = 800 %}
+{% assign img_height = img_width | times: featured_image.height | divided_by: featured_image.width %}
+<div class="product-images-carousel">
+  <div class="product-images-slider">
+    <div class="product-image-item">
+      <img class="product-image" src="{{ img_url | replace: '{width}', img_width | replace: '{height}', img_height }}" alt="{{ featured_image.alt | escape }}">
+    </div>
+    {% for image in product.images %}
+      {% if image.id != featured_image.id %}
+        <div class="product-image-item">
+          <img class="product-image" src="{{ image | img_url: '800x' }}" alt="{{ image.alt | escape }}">
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+{% if product.images.size > 1 %}
+  <script src="{{ 'slick.min.js' | asset_url }}"></script>
+  <script>
+    jQuery(document).ready(function($) {
+      $('.product-images-slider').slick({
+        dots: false,
+        arrows: true,
+        infinite: true,
+        speed: 300,
+        slidesToShow: 3,
+        slidesToScroll: 1,
+        centerMode: true,
+        centerPadding: '10px',
+        variableWidth: true
+      });
+    });
+  </script>
+{% endif %}
               {%- assign models = product.media | where: 'media_type', 'model' -%}
               {% if models.size > 0 %}
                 <script type="application/json" class="model-json">
