@@ -693,5 +693,39 @@
   <div class="carousel-cell">
     <img class="product__image" src="{{ image.src | img_url }}" alt="{{ image.alt | escape }}">
   </div>
-       {% endfor %}
-      {% endif %}
+       {% if product.variants.size > 1 %}
+  <div class="form__control-group">
+    {% for option in product.options %}
+      {% assign option_index = forloop.index0 %}
+      <label class="form__label{% if option.required %} form__label--required{% endif %}" for="product-select-option-{{ option_index }}">
+        {{ option.name }}
+        {% if option.required %}
+          <span class="required">*</span>
+        {% endif %}
+      </label>
+      <div class="form__dropdown-wrapper{% if option.name == 'Title' %} form__dropdown-wrapper--title{% endif %}">
+        <select class="form__dropdown{% if option.name == 'Title' %} form__dropdown--title{% endif %}" id="product-select-option-{{ option_index }}" data-index="{{ option_index }}">
+          {% for value in option.values %}
+            <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value }}</option>
+            {% if featured_collections %}
+  <div class="product-featured-collections">
+    <h2>{{ 'collections.featured_collections' | t }}</h2>
+    <ul>
+      {% for collection in featured_collections %}
+        {% assign collection_url = collection.url %}
+        {% assign collection_title = collection.title %}
+        {% assign collection_image = collection.image | img_url: '250x' | img_tag: collection_title %}
+        <li>
+          <a href="{{ collection_url }}">{{ collection_image }}</a>
+          <h3>{{ collection_title }}</h3>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  {% endif %}
+  {% endfor %}
+        </select>
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
