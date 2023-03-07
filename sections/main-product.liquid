@@ -61,7 +61,7 @@
 <div class="product-images-carousel">
   <div class="product-images-slider">
     <div class="product-image-item">
-      <img class="product-image" src="{{ img_url | replace: '{width}', img_width | replace: '{height}', img_height }}" alt="{{ featured_image.alt | escape }}">
+      data-src="{{ img_url | replace: '{width}', width }}"
     </div>
     {% for image in product.images %}
       {% if image.id != featured_image.id %}
