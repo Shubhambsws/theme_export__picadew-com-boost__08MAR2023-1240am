@@ -689,7 +689,9 @@
         <button class="product-card__button button button--disabled{% if section.settings.button_style == 'outline' %} button--outline{% endif %}" disabled="disabled">
           {{ 'products.product.sold_out' | t }}
         </button>
-      {% endif %}
-    </div>
+{% for image in product.images %}
+  <div class="carousel-cell">
+    <img class="product__image" src="{{ image.src | img_url }}" alt="{{ image.alt | escape }}">
   </div>
-{% endfor %}
+       {% endfor %}
+      {% endif %}
