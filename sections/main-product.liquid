@@ -641,11 +641,32 @@
   {% endunless %}
 </div>
 
-{% if variant.image %}
-  {{- assign img_url = variant.image.src -}}
-{% elsif product.images.size > 0 %}
-  {{- assign img_url = product.images[0] | img_url: '1x1' | replace: '_1x1.', '_{width}x.' -}}
-{% endif %}}
+{% capture img_url %}
+  {{ featured_image.src | img_url: '1x1' }}
+{% endcapture %}
+
+{% assign img_url = img_url | replace: '_1x1.', '_{width}x.' %}
+
+{% assign alt_text = featured_image.alt %}
+
+<div class="main-product__image-wrapper">
+  <div class="main-product__image-item js-image-zoom">
+    <img class="main-product__image" src="{{ img_url | replace: '{width}', '1024' }}" data-src="{{ img_url }}" alt="{{ alt_text }}" data-zoom-image="{{ img_url }}" data-image-id="{{ featured_image.id }}" data-image-index="{{ forloop.index }}" data-image-count="{{ product.images.size }}" data-thumbnail-id="{{ featured_image.thumbnail.id }}" data-thumbnail-index="{{ forloop.index }}" data-thumbnail-count="{{ product.images.size }}" width="1024" height="1024">
+  </div>
+  {% if product.images.size > 1 %}
+    {% for image in product.images offset:1 limit:4 %}
+      {% capture img_url %}
+        {{ image.src | img_url: '1x1' }}
+      {% endcapture %}
+
+      {% assign img_url = img_url | replace: '_1x1.', '_{width}x.' %}
+
+      <div class="main-product__image-item">
+        <img class="main-product__image" src="{{ img_url | replace: '{width}', '1024' }}" data-src="{{ img_url }}" alt="{{ image.alt }}" data-image-id="{{ image.id }}" data-image-index="{{ forloop.index }}" data-image-count="{{ product.images.size }}" data-thumbnail-id="{{ image.thumbnail.id }}" data-thumbnail-index="{{ forloop.index }}" data-thumbnail-count="{{ product.images.size }}" width="1024" height="1024">
+      </div>
+    {% endfor %}
+  {% endif %}
+</div>
 {% schema %}
   {
     "name": "Product details",
