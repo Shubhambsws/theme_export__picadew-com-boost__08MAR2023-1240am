@@ -61,7 +61,7 @@
 <div class="product-images-carousel">
   <div class="product-images-slider">
     <div class="product-image-item">
-      <img src="{{ img_url | replace: '{width}', '1000' | replace: '{height}', '1000' }}" alt="{{ image.alt | escape }}" }} />
+      {% assign img_url = featured_image | img_url: '1024x1024' | replace: '_1024x1024.', '_{width}x.' %}
     </div>
     {% for image in product.images %}
      {% assign img_url = featured_image | img_url: 'master' %}
@@ -70,7 +70,7 @@
 {% for image in product.images %}
 <div class="gallery-item">
 <a href="{{ image.src | img_url: '1024x1024' }}" data-fancybox="gallery" data-caption="{{ image.alt | escape }}">
-<img src="{{ img_url | replace: '{width}', '300' | replace: '{height}', '300' }}" alt="{{ image.alt | escape }}" />
+{% assign img_url = featured_image | img_url: '1024x1024' | replace: '_1024x1024.', '_{width}x.' %}
 </a>
 </div>
 {% endfor %}
