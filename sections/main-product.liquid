@@ -61,15 +61,21 @@
 <div class="product-images-carousel">
   <div class="product-images-slider">
     <div class="product-image-item">
-      data-src="{{ img_url | replace: '{width}', width }}"
+      <img src="{{ img_url | replace: '{width}', '300' | replace: '{height}', '300' }}" alt="{{ image.alt | escape }}" />
     </div>
     {% for image in product.images %}
-      {% if image.id != featured_image.id %}
-        <div class="product-image-item">
-          <img class="product-image" src="{{ image | img_url: '800x' }}" alt="{{ image.alt | escape }}">
-        </div>
-      {% endif %}
-    {% endfor %}
+     {% assign img_url = featured_image | img_url: 'master' %}
+{% if product.images.size > 1 %}
+<div class="product-gallery owl-carousel owl-theme">
+{% for image in product.images %}
+<div class="gallery-item">
+<a href="{{ image.src | img_url: '1024x1024' }}" data-fancybox="gallery" data-caption="{{ image.alt | escape }}">
+<img src="{{ img_url | replace: '{width}', '300' | replace: '{height}', '300' }}" alt="{{ image.alt | escape }}" />
+</a>
+</div>
+{% endfor %}
+</div>
+{% endif %}
   </div>
 </div>
 {% if product.images.size > 1 %}
