@@ -41,17 +41,23 @@
     <div class="product__images--carousel">
       {% for image in product.images %}
         <div class="product__image">
-          <img src="{{ image.src | img_url: '1x1' }}" alt="{{ image.alt | escape }}">
-        </div>
-      {% endfor %}
+{% if section.settings.product_page_carousel_enable %}
+  {% assign images = product.images %}
+  {% if images.size > 1 %}
+    <div class="product-page-carousel-container">
+      <div class="product-page-carousel owl-carousel owl-theme">
+        {% for image in images %}
+          <div class="item">
+            <a href="{{ image | img_url: 'master' }}" class="product-page-carousel-item" data-fancybox="{{ product.title }}" data-caption="{{ image.alt | escape }}">
+              <img src="{{ image | img_url: '1000x' }}" alt="{{ image.alt | escape }}" loading="lazy">
+            </a>
+          </div>
+        {% endfor %}
+      </div>
     </div>
-  </div>
+  {% endif %}
 {% endif %}
-              
-                </div>
-                {% render 'media' with featured_media %}
-                {% assign img_width = 800 %}
-{% assign img_height = img_width | times: featured_image.height | divided_by: featured_image.width %}
+
 <div class="product-images-carousel">
   <div class="product-images-slider">
     <div class="product-image-item">
