@@ -36,20 +36,21 @@
   </div>
 {% endif %}
                   
-{% assign current_variant = product.selected_or_first_available_variant %}
-{% assign featured_image = current_variant.featured_image | default: product.featured_image %}
-{% assign img_url = featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
-{% endfor %}
-    {% endif %}
-  {% endfor %}
-{% endunless %}
-
-                  {% endfor %}
+{% if section.settings.enable_product_carousel %}
+  <div class="product__images--wrapper">
+    <div class="product__images--carousel">
+      {% for image in product.images %}
+        <div class="product__image">
+          <img src="{{ image.src | img_url: '1x1' }}" alt="{{ image.alt | escape }}">
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+              
                 </div>
-              {% else %}
                 {% render 'media' with featured_media %}
-              {% endif %}
-{% assign img_width = 800 %}
+                {% assign img_width = 800 %}
 {% assign img_height = img_width | times: featured_image.height | divided_by: featured_image.width %}
 <div class="product-images-carousel">
   <div class="product-images-slider">
