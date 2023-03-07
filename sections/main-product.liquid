@@ -42,10 +42,11 @@
 {% assign featured_image = current_variant.featured_image | default: product.featured_image %}
 {% assign img_url = featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
 
-                        </div>
-                      {%- else -%}
-                        </a>
-                      {%- endunless -%}
+                        {% endfor %}
+    {% endif %}
+  {% endfor %}
+{% endunless %}
+
                     </div>
                   {% endfor %}
                 </div>
