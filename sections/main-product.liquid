@@ -22,80 +22,36 @@
         <div class="product-layout-grid__images layout--{{ section.settings.media_layout }}{% if product.media.size > 1 %} has-multiple-images{% endif %}" data-product-image-layout="{{ section.settings.media_layout | split: '-' | first }}">
           <div class="product-layout-grid__images-and-thumbs {% if section.settings.enable_sticky_media %} sticky-element{% endif %}">
             <div class="product-detail__images-container">
-              {% if product.images.size > 1 %}
-  <div class="product-images">
-    <div class="product-images-carousel">
-      {% for image in product.images %}
-        <div class="product-image">
-          <a href="{{ image.src | img_url: '1024x1024' }}" data-fancybox="product-gallery" data-caption="{{ image.alt | escape }}">
-            <img src="{{ image.src | img_url: 'grande' }}" alt="{{ image.alt | escape }}" />
-          </a>
-        </div>
-      {% endfor %}
-    </div>
-  </div>
-{% endif %}
-                  
-{% if section.settings.enable_product_carousel %}
-  <div class="product__images--wrapper">
-    <div class="product__images--carousel">
-      {% for image in product.images %}
-        <div class="product__image">
-{% if section.settings.product_page_carousel_enable %}
-  {% assign images = product.images %}
-  {% if images.size > 1 %}
-    <div class="product-page-carousel-container">
-      <div class="product-page-carousel owl-carousel owl-theme">
-        {% for image in images %}
-          <div class="item">
-            <a href="{{ image | img_url: 'master' }}" class="product-page-carousel-item" data-fancybox="{{ product.title }}" data-caption="{{ image.alt | escape }}">
-              <img src="{{ image | img_url: '1000x' }}" alt="{{ image.alt | escape }}" loading="lazy">
-            </a>
-          </div>
-        {% endfor %}
-      </div>
-    </div>
-  {% endif %}
-{% endif %}
+              {% if product.media.size > 0 %}
+                <div class="product-detail__images" data-featured-media-id="{{ featured_media.id }}">
+                  {% for media in product.media %}
+                    <div class="product-detail__image">
+                      {%- if media.media_type == 'image' -%}
+                        <a href="{{ media.preview_image.src | img_url: 'master' }}"
+                          data-product-image
+                          data-product-media
+                          data-media-id="{{ media.id }}"
+                          data-image-w="{{ media.preview_image.width }}"
+                          data-image-h="{{ media.preview_image.height }}"
+                          class="global-border-radius">
+                      {%- else -%}
+                        <div class="global-border-radius" data-product-media data-media-id="{{ media.id }}">
+                      {%- endif -%}
 
-<div class="product-images-carousel">
-  <div class="product-images-slider">
-    <div class="product-image-item">
-      {% assign img_url = featured_image | img_url: '1024x1024' | replace: '_1024x1024.', '_{width}x.' %}
-    </div>
-    {% for image in product.images %}
-     {% assign img_url = featured_image | img_url: 'master' %}
-{% if product.images.size > 1 %}
-<div class="product-gallery owl-carousel owl-theme">
-{% for image in product.images %}
-<div class="gallery-item">
-<a href="{{ image.src | img_url: '1024x1024' }}" data-fancybox="gallery" data-caption="{{ image.alt | escape }}">
-{% assign img_url = featured_image | img_url: '1024x1024' | replace: '_1024x1024.', '_{width}x.' %}
-</a>
-</div>
-{% endfor %}
-</div>
-{% endif %}
-  </div>
-</div>
-{% if product.images.size > 1 %}
-  <script src="{{ 'slick.min.js' | asset_url }}"></script>
-  <script>
-    jQuery(document).ready(function($) {
-      $('.product-images-slider').slick({
-        dots: false,
-        arrows: true,
-        infinite: true,
-        speed: 300,
-        slidesToShow: 3,
-        slidesToScroll: 1,
-        centerMode: true,
-        centerPadding: '10px',
-        variableWidth: true
-      });
-    });
-  </script>
-{% endif %}
+                      {%- render 'media', media: media -%}
+
+                      {%- unless media.media_type == 'image' -%}
+                        </div>
+                      {%- else -%}
+                        </a>
+                      {%- endunless -%}
+                    </div>
+                  {% endfor %}
+                </div>
+              {% else %}
+                {% render 'media' with featured_media %}
+              {% endif %}
+
               {%- assign models = product.media | where: 'media_type', 'model' -%}
               {% if models.size > 0 %}
                 <script type="application/json" class="model-json">
@@ -641,91 +597,1092 @@
   {% endunless %}
 </div>
 
-{% capture img_url %}
-  {{ featured_image.src | img_url: '1x1' }}
-{% endcapture %}
+{%- assign current_variant = product.selected_or_first_available_variant -%}
+{% render 'structured-data-product', product: product, current_variant: current_variant %}
 
-{% assign img_url = img_url | replace: '_1x1.', '_{width}x.' %}
-
-{% assign alt_text = featured_image.alt %}
-
-<div class="main-product__image-wrapper">
-  <div class="main-product__image-item js-image-zoom">
-    {% assign img_url = product.featured_image.src | img_url: '1x1' | replace: '_1x1.','{width}x.' %}}
-  </div>
-  {% if product.images.size > 1 %}
-    {% for image in product.images offset:1 limit:4 %}
-      {% capture img_url %}
-        {{ image.src | img_url: '1x1' }}
-      {% endcapture %}
-
-      {% assign img_url = img_url | replace: '_1x1.', '_{width}x.' %}
-
-      <div class="main-product__image-item">
-        {% assign img_url = product.featured_image.src | img_url: '1x1' | replace: '_1x1.','{width}x.' %}}
-      </div>
-    {% endfor %}
-  {% endif %}
-</div>
-{% for product in collection.products %}
-  {% assign img_url = product.featured_image | img_url: '1x1' | replace: '_1x1.', '_{width}x.' %}
-  <div class="product-card__wrapper">
-    <a href="{{ product.url }}" class="product-card__image-wrapper">
-      <img src="{{ img_url | img_url: '300x' }}" alt="{{ product.featured_image.alt }}">
-    </a>
-    <div class="product-card__info">
-      <h2 class="product-card__title">
-        <a href="{{ product.url }}">{{ product.title }}</a>
-      </h2>
-      <div class="product-card__price">{{ product.price | money }}</div>
-      {% if product.available %}
-        <form action="/cart/add" method="post" enctype="multipart/form-data" novalidate>
-          <input type="hidden" name="id" value="{{ product.variants.first.id }}">
-          <button type="submit" class="product-card__button button button--primary{% if section.settings.button_style == 'outline' %} button--outline{% endif %}">
-            {{ 'products.product.add_to_cart' | t }}
-          </button>
-        </form>
-      {% else %}
-        <button class="product-card__button button button--disabled{% if section.settings.button_style == 'outline' %} button--outline{% endif %}" disabled="disabled">
-          {{ 'products.product.sold_out' | t }}
-        </button>
-{% for image in product.images %}
-  <div class="carousel-cell">
-    <img class="product__image" src="{{ image.src | img_url }}" alt="{{ image.alt | escape }}">
-  </div>
-       {% if product.variants.size > 1 %}
-  <div class="form__control-group">
-    {% for option in product.options %}
-      {% assign option_index = forloop.index0 %}
-      <label class="form__label{% if option.required %} form__label--required{% endif %}" for="product-select-option-{{ option_index }}">
-        {{ option.name }}
-        {% if option.required %}
-          <span class="required">*</span>
-        {% endif %}
-      </label>
-      <div class="form__dropdown-wrapper{% if option.name == 'Title' %} form__dropdown-wrapper--title{% endif %}">
-        <select class="form__dropdown{% if option.name == 'Title' %} form__dropdown--title{% endif %}" id="product-select-option-{{ option_index }}" data-index="{{ option_index }}">
-          {% for value in option.values %}
-            <option value="{{ value | escape }}"{% if option.selected_value == value %} selected="selected"{% endif %}>{{ value }}</option>
-            {% if featured_collections %}
-  <div class="product-featured-collections">
-    <h2>{{ 'collections.featured_collections' | t }}</h2>
-    <ul>
-      {% for collection in featured_collections %}
-        {% assign collection_url = collection.url %}
-        {% assign collection_title = collection.title %}
-        {% assign collection_image = collection.image | img_url: '250x' | img_tag: collection_title %}
-        <li>
-          <a href="{{ collection_url }}">{{ collection_image }}</a>
-          <h3>{{ collection_title }}</h3>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-  {% endif %}
-  {% endfor %}
-        </select>
-      </div>
-    {% endfor %}
-  </div>
-{% endif %}
+{% schema %}
+  {
+    "name": "Product details",
+    "class": "section-product-template",
+    "settings": [
+      {
+        "type": "header",
+        "content": "Media"
+      },
+      {
+        "type": "paragraph",
+        "content": "Learn more about [media types](https://help.shopify.com/en/manual/products/product-media)"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_sticky_media",
+        "label": "Enable stick on scroll",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "media_size",
+        "label": "Size",
+        "options": [
+          {
+            "value": "small",
+            "label": "Small"
+          },
+          {
+            "value": "medium",
+            "label": "Medium"
+          },
+          {
+            "value": "large",
+            "label": "Large"
+          }
+        ],
+        "default": "medium"
+      },
+      {
+        "type": "select",
+        "id": "media_layout",
+        "label": "Layout",
+        "options": [
+          {
+            "label": "List",
+            "value": "list"
+          },
+          {
+            "label": "Thumbnails - below",
+            "value": "thumbnails-below"
+          },
+          {
+            "label": "Thumbnails - left",
+            "value": "thumbnails-left"
+          }
+        ],
+        "default": "list"
+      },
+      {
+        "type": "checkbox",
+        "id": "enable_video_looping",
+        "label": "Enable video looping",
+        "default": false
+      }
+    ],
+    "blocks": [
+      {
+        "type": "@app"
+      },
+      {
+        "type": "buy_buttons",
+        "name": "Buy buttons",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "checkbox",
+            "id": "show_quantity_selector",
+            "label": "Show quantity selector",
+            "default": true
+          },
+          {
+            "type": "checkbox",
+            "id": "enable_payment_button",
+            "label": "Show dynamic checkout button",
+            "info": "Each customer will see their preferred payment method from those available on your store, such as PayPal or Apple Pay. [Learn more](https://help.shopify.com/manual/using-themes/change-the-layout/dynamic-checkout)",
+            "default": true
+          },
+          {
+            "type": "checkbox",
+            "id": "show_pickup_availability",
+            "label": "Show pickup availability",
+            "default": true,
+            "info": "Show customers where they can pick up the product. [Learn more](https://help.shopify.com/en/manual/shipping/setting-up-and-managing-your-shipping/local-methods/local-pickup)"
+          },
+          {
+            "type": "checkbox",
+            "id": "show_backorder_text",
+            "label": "Show backorder text",
+            "default": true,
+            "info": "Only shows for products which use Shopify inventory tracking and are available to purchase when out of stock."
+          },
+          {
+            "type": "header",
+            "content": "Inventory"
+          },
+          {
+            "type": "select",
+            "id": "show_inventory_notice",
+            "label": "Show inventory notice",
+            "options": [
+              {
+                "label": "Never",
+                "value": "never"
+              },
+              {
+                "label": "Only when inventory low",
+                "value": "low"
+              },
+              {
+                "label": "Always",
+                "value": "always"
+              }
+            ],
+            "default": "never"
+          },
+          {
+            "type": "select",
+            "id": "show_inventory_count",
+            "label": "Show count in inventory notice",
+            "options": [
+              {
+                "label": "Never",
+                "value": "never"
+              },
+              {
+                "label": "Only when inventory low",
+                "value": "low"
+              },
+              {
+                "label": "Always",
+                "value": "always"
+              }
+            ],
+            "default": "low"
+          },
+          {
+            "type": "range",
+            "id": "inventory_notice_threshold",
+            "min": 1,
+            "max": 100,
+            "step": 1,
+            "label": "Low inventory threshold",
+            "default": 10
+          }
+        ]
+      },
+      {
+        "type": "complementary",
+        "name": "Complementary products",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "paragraph",
+            "content": "To select complementary products, add the Search & Discovery app. [Learn more](https:\/\/shopify.dev\/themes\/product-merchandising\/recommendations)"
+          },
+          {
+            "type": "text",
+            "id": "block_heading",
+            "default": "Pairs well with",
+            "label": "Heading"
+          },
+          {
+            "type": "checkbox",
+            "id": "enable_carousel",
+            "label": "Enable carousel",
+            "default": true
+          },
+          {
+            "type": "range",
+            "id": "max_products",
+            "min": 1,
+            "max": 10,
+            "step": 1,
+            "label": "Maximum products to show",
+            "default": 10
+          }
+        ]
+      },
+      {
+        "type": "custom_liquid",
+        "name": "Custom Liquid",
+        "settings": [
+          {
+            "type": "liquid",
+            "id": "custom_liquid",
+            "label": "Custom Liquid"
+          }
+        ]
+      },
+      {
+        "type": "description",
+        "name": "Description",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "checkbox",
+            "id": "full_width",
+            "label": "Show full width",
+            "info": "Will show underneath product media and details",
+            "default": false
+          },
+          {
+            "type": "checkbox",
+            "id": "show_tabs",
+            "label": "Enable tabs",
+            "default": false
+          },
+          {
+            "type": "paragraph",
+            "content": "Show 2 further tabs by adding a title and content or selecting a page"
+          },
+          {
+            "type": "radio",
+            "id": "tab_direction",
+            "label": "Tab direction",
+            "default": "horizontal",
+            "options": [
+              {
+                "value": "horizontal",
+                "label": "Horizontal"
+              },
+              {
+                "value": "vertical",
+                "label": "Vertical"
+              }
+            ]
+          },
+          {
+            "type": "header",
+            "content": "Tab 1"
+          },
+          {
+            "type": "select",
+            "id": "icon_1",
+            "label": "Vertical tab icon",
+            "default": "",
+            "options": [
+              {
+                "value": "",
+                "label": "No icon"
+              },
+              {
+                "value": "award",
+                "label": "Award"
+              },
+              {
+                "value": "box",
+                "label": "Box"
+              },
+              {
+                "value": "briefcase",
+                "label": "Briefcase"
+              },
+              {
+                "value": "calendar-days",
+                "label": "Calendar days"
+              },
+              {
+                "value": "check",
+                "label": "Check"
+              },
+              {
+                "value": "check-circle",
+                "label": "Check circle"
+              },
+              {
+                "value": "clock",
+                "label": "Clock"
+              },
+              {
+                "value": "credit-card",
+                "label": "Credit card"
+              },
+              {
+                "value": "dollar-sign",
+                "label": "Dollar sign"
+              },
+              {
+                "value": "eye",
+                "label": "Eye"
+              },
+              {
+                "value": "feather",
+                "label": "Feather"
+              },
+              {
+                "value": "gift",
+                "label": "Gift"
+              },
+              {
+                "value": "heart",
+                "label": "Heart"
+              },
+              {
+                "value": "help-circle",
+                "label": "Help circle"
+              },
+              {
+                "value": "leaf",
+                "label": "Leaf"
+              },
+              {
+                "value": "lock",
+                "label": "Lock"
+              },
+              {
+                "value": "map-pin",
+                "label": "Map pin"
+              },
+              {
+                "value": "menu",
+                "label": "Menu"
+              },
+              {
+                "value": "message-circle",
+                "label": "Message circle"
+              },
+              {
+                "value": "package",
+                "label": "Package"
+              },
+              {
+                "value": "percent",
+                "label": "Percent"
+              },
+              {
+                "value": "plane",
+                "label": "Plane"
+              },
+              {
+                "value": "tag",
+                "label": "Tag"
+              },
+              {
+                "value": "ruler",
+                "label": "Ruler"
+              },
+              {
+                "value": "scissors",
+                "label": "Scissors"
+              },
+              {
+                "value": "search",
+                "label": "Search"
+              },
+              {
+                "value": "shirt",
+                "label": "Shirt"
+              },
+              {
+                "value": "shrub",
+                "label": "Shrub"
+              },
+              {
+                "value": "shopping-bag",
+                "label": "Shopping bag"
+              },
+              {
+                "value": "shopping-cart",
+                "label": "Shopping cart"
+              },
+              {
+                "value": "star",
+                "label": "Star"
+              },
+              {
+                "value": "truck",
+                "label": "Truck"
+              },
+              {
+                "value": "undo",
+                "label": "Undo"
+              },
+              {
+                "value": "user",
+                "label": "User"
+              },
+              {
+                "value": "vegan",
+                "label": "Vegan"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "id": "tab_1_title",
+            "label": "Title",
+            "default": "Description"
+          },
+          {
+            "type": "header",
+            "content": "Tab 2"
+          },
+          {
+            "type": "select",
+            "id": "icon_2",
+            "label": "Vertical tab icon",
+            "default": "",
+            "options": [
+              {
+                "value": "",
+                "label": "No icon"
+              },
+              {
+                "value": "award",
+                "label": "Award"
+              },
+              {
+                "value": "box",
+                "label": "Box"
+              },
+              {
+                "value": "briefcase",
+                "label": "Briefcase"
+              },
+              {
+                "value": "calendar-days",
+                "label": "Calendar days"
+              },
+              {
+                "value": "check",
+                "label": "Check"
+              },
+              {
+                "value": "check-circle",
+                "label": "Check circle"
+              },
+              {
+                "value": "clock",
+                "label": "Clock"
+              },
+              {
+                "value": "credit-card",
+                "label": "Credit card"
+              },
+              {
+                "value": "dollar-sign",
+                "label": "Dollar sign"
+              },
+              {
+                "value": "eye",
+                "label": "Eye"
+              },
+              {
+                "value": "feather",
+                "label": "Feather"
+              },
+              {
+                "value": "gift",
+                "label": "Gift"
+              },
+              {
+                "value": "heart",
+                "label": "Heart"
+              },
+              {
+                "value": "help-circle",
+                "label": "Help circle"
+              },
+              {
+                "value": "leaf",
+                "label": "Leaf"
+              },
+              {
+                "value": "lock",
+                "label": "Lock"
+              },
+              {
+                "value": "map-pin",
+                "label": "Map pin"
+              },
+              {
+                "value": "menu",
+                "label": "Menu"
+              },
+              {
+                "value": "message-circle",
+                "label": "Message circle"
+              },
+              {
+                "value": "package",
+                "label": "Package"
+              },
+              {
+                "value": "percent",
+                "label": "Percent"
+              },
+              {
+                "value": "plane",
+                "label": "Plane"
+              },
+              {
+                "value": "tag",
+                "label": "Tag"
+              },
+              {
+                "value": "ruler",
+                "label": "Ruler"
+              },
+              {
+                "value": "scissors",
+                "label": "Scissors"
+              },
+              {
+                "value": "search",
+                "label": "Search"
+              },
+              {
+                "value": "shirt",
+                "label": "Shirt"
+              },
+              {
+                "value": "shrub",
+                "label": "Shrub"
+              },
+              {
+                "value": "shopping-bag",
+                "label": "Shopping bag"
+              },
+              {
+                "value": "shopping-cart",
+                "label": "Shopping cart"
+              },
+              {
+                "value": "star",
+                "label": "Star"
+              },
+              {
+                "value": "truck",
+                "label": "Truck"
+              },
+              {
+                "value": "undo",
+                "label": "Undo"
+              },
+              {
+                "value": "user",
+                "label": "User"
+              },
+              {
+                "value": "vegan",
+                "label": "Vegan"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "id": "tab_2_title",
+            "label": "Title"
+          },
+          {
+            "type": "richtext",
+            "id": "tab_2_content",
+            "label": "Content"
+          },
+          {
+            "type": "page",
+            "id": "tab_2_page",
+            "label": "Content from page"
+          },
+          {
+            "type": "header",
+            "content": "Tab 3"
+          },
+          {
+            "type": "select",
+            "id": "icon_3",
+            "label": "Vertical tab icon",
+            "default": "",
+            "options": [
+              {
+                "value": "",
+                "label": "No icon"
+              },
+              {
+                "value": "award",
+                "label": "Award"
+              },
+              {
+                "value": "box",
+                "label": "Box"
+              },
+              {
+                "value": "briefcase",
+                "label": "Briefcase"
+              },
+              {
+                "value": "calendar-days",
+                "label": "Calendar days"
+              },
+              {
+                "value": "check",
+                "label": "Check"
+              },
+              {
+                "value": "check-circle",
+                "label": "Check circle"
+              },
+              {
+                "value": "clock",
+                "label": "Clock"
+              },
+              {
+                "value": "credit-card",
+                "label": "Credit card"
+              },
+              {
+                "value": "dollar-sign",
+                "label": "Dollar sign"
+              },
+              {
+                "value": "eye",
+                "label": "Eye"
+              },
+              {
+                "value": "feather",
+                "label": "Feather"
+              },
+              {
+                "value": "gift",
+                "label": "Gift"
+              },
+              {
+                "value": "heart",
+                "label": "Heart"
+              },
+              {
+                "value": "help-circle",
+                "label": "Help circle"
+              },
+              {
+                "value": "leaf",
+                "label": "Leaf"
+              },
+              {
+                "value": "lock",
+                "label": "Lock"
+              },
+              {
+                "value": "map-pin",
+                "label": "Map pin"
+              },
+              {
+                "value": "menu",
+                "label": "Menu"
+              },
+              {
+                "value": "message-circle",
+                "label": "Message circle"
+              },
+              {
+                "value": "package",
+                "label": "Package"
+              },
+              {
+                "value": "percent",
+                "label": "Percent"
+              },
+              {
+                "value": "plane",
+                "label": "Plane"
+              },
+              {
+                "value": "tag",
+                "label": "Tag"
+              },
+              {
+                "value": "ruler",
+                "label": "Ruler"
+              },
+              {
+                "value": "scissors",
+                "label": "Scissors"
+              },
+              {
+                "value": "search",
+                "label": "Search"
+              },
+              {
+                "value": "shirt",
+                "label": "Shirt"
+              },
+              {
+                "value": "shrub",
+                "label": "Shrub"
+              },
+              {
+                "value": "shopping-bag",
+                "label": "Shopping bag"
+              },
+              {
+                "value": "shopping-cart",
+                "label": "Shopping cart"
+              },
+              {
+                "value": "star",
+                "label": "Star"
+              },
+              {
+                "value": "truck",
+                "label": "Truck"
+              },
+              {
+                "value": "undo",
+                "label": "Undo"
+              },
+              {
+                "value": "user",
+                "label": "User"
+              },
+              {
+                "value": "vegan",
+                "label": "Vegan"
+              }
+            ]
+          },
+          {
+            "type": "text",
+            "id": "tab_3_title",
+            "label": "Title"
+          },
+          {
+            "type": "richtext",
+            "id": "tab_3_content",
+            "label": "Content"
+          },
+          {
+            "type": "page",
+            "id": "tab_3_page",
+            "label": "Content from page"
+          }
+        ]
+      },
+      {
+        "type": "accordion",
+        "name": "Collapsible tab",
+        "settings": [
+          {
+            "type": "text",
+            "id": "title",
+            "label": "Heading",
+            "default": "Collapsible tab"
+          },
+          {
+            "type": "select",
+            "id": "icon",
+            "label": "Icon",
+            "default": "",
+            "options": [
+              {
+                "value": "",
+                "label": "No icon"
+              },
+              {
+                "value": "award",
+                "label": "Award"
+              },
+              {
+                "value": "box",
+                "label": "Box"
+              },
+              {
+                "value": "briefcase",
+                "label": "Briefcase"
+              },
+              {
+                "value": "calendar-days",
+                "label": "Calendar days"
+              },
+              {
+                "value": "check",
+                "label": "Check"
+              },
+              {
+                "value": "check-circle",
+                "label": "Check circle"
+              },
+              {
+                "value": "clock",
+                "label": "Clock"
+              },
+              {
+                "value": "credit-card",
+                "label": "Credit card"
+              },
+              {
+                "value": "dollar-sign",
+                "label": "Dollar sign"
+              },
+              {
+                "value": "eye",
+                "label": "Eye"
+              },
+              {
+                "value": "feather",
+                "label": "Feather"
+              },
+              {
+                "value": "gift",
+                "label": "Gift"
+              },
+              {
+                "value": "heart",
+                "label": "Heart"
+              },
+              {
+                "value": "help-circle",
+                "label": "Help circle"
+              },
+              {
+                "value": "leaf",
+                "label": "Leaf"
+              },
+              {
+                "value": "lock",
+                "label": "Lock"
+              },
+              {
+                "value": "map-pin",
+                "label": "Map pin"
+              },
+              {
+                "value": "menu",
+                "label": "Menu"
+              },
+              {
+                "value": "message-circle",
+                "label": "Message circle"
+              },
+              {
+                "value": "package",
+                "label": "Package"
+              },
+              {
+                "value": "percent",
+                "label": "Percent"
+              },
+              {
+                "value": "plane",
+                "label": "Plane"
+              },
+              {
+                "value": "tag",
+                "label": "Tag"
+              },
+              {
+                "value": "ruler",
+                "label": "Ruler"
+              },
+              {
+                "value": "scissors",
+                "label": "Scissors"
+              },
+              {
+                "value": "search",
+                "label": "Search"
+              },
+              {
+                "value": "shirt",
+                "label": "Shirt"
+              },
+              {
+                "value": "shrub",
+                "label": "Shrub"
+              },
+              {
+                "value": "shopping-bag",
+                "label": "Shopping bag"
+              },
+              {
+                "value": "shopping-cart",
+                "label": "Shopping cart"
+              },
+              {
+                "value": "star",
+                "label": "Star"
+              },
+              {
+                "value": "truck",
+                "label": "Truck"
+              },
+              {
+                "value": "undo",
+                "label": "Undo"
+              },
+              {
+                "value": "user",
+                "label": "User"
+              },
+              {
+                "value": "vegan",
+                "label": "Vegan"
+              }
+            ]
+          },
+          {
+            "type": "richtext",
+            "id": "content",
+            "label": "Tab content",
+            "default": "<p>Collapsible tab content</p>"
+          },
+          {
+            "type": "page",
+            "id": "page",
+            "label": "Tab content from page"
+          },
+          {
+            "type": "checkbox",
+            "id": "open",
+            "label": "Open",
+            "default": false
+          },
+          {
+            "type": "checkbox",
+            "id": "full_width",
+            "label": "Show full width",
+            "info": "Will show underneath product media and details",
+            "default": false
+          }
+        ]
+      },
+      {
+        "type": "image",
+        "name": "Image",
+        "settings": [
+          {
+            "type": "image_picker",
+            "id": "image",
+            "label": "Image"
+          },
+          {
+            "type": "range",
+            "id": "image_width",
+            "min": 60,
+            "max": 700,
+            "step": 10,
+            "unit": "px",
+            "label": "Image width",
+            "default": 700
+          },
+          {
+            "type": "url",
+            "id": "url",
+            "label": "Link"
+          }
+        ]
+      },
+      {
+        "type": "link",
+        "name": "Link",
+        "settings": [
+          {
+            "type": "url",
+            "id": "url",
+            "label": "Link"
+          },
+          {
+            "type": "text",
+            "id": "text",
+            "label": "Text",
+            "default": "Link text"
+          },
+          {
+            "type": "radio",
+            "id": "style",
+            "label": "Button style",
+            "options": [
+              { "value": "button_1", "label": "Button - primary" },
+              { "value": "button_2", "label": "Button - secondary" },
+              { "value": "link_style", "label": "Link"}
+            ],
+            "default": "button_1"
+          }
+        ]
+      },
+      {
+        "type": "reviews_summary",
+        "name": "Reviews summary",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "paragraph",
+            "content": "Add reviews by installing the [Shopify Product Reviews app](https:\/\/apps.shopify.com\/product-reviews?ref=cleancanvas)"
+          }
+        ]
+      },
+      {
+        "type": "richtext",
+        "name": "Rich text",
+        "settings": [
+          {
+            "type": "richtext",
+            "id": "richtext",
+            "label": "Rich text",
+            "default": "<p>Rich text block</p>"
+          }
+        ]
+      },
+      {
+        "type": "sharing",
+        "name": "Sharing",
+        "limit": 1
+      },
+      {
+        "type": "sku",
+        "name": "SKU",
+        "limit": 1
+      },
+      {
+        "type": "text",
+        "name": "Text",
+        "settings": [
+          {
+            "type": "text",
+            "id": "text",
+            "label": "Text",
+            "default": "Text block"
+          }
+        ]
+      },
+      {
+        "type": "title_and_price",
+        "name": "Title and price",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "checkbox",
+            "id": "show_tax_and_shipping",
+            "label": "Show tax status and shipping policy link",
+            "default": false
+          }
+        ]
+      },
+      {
+        "type": "type",
+        "name": "Type",
+        "limit": 1
+      },
+      {
+        "type": "variant_picker",
+        "name": "Variant picker",
+        "limit": 1,
+        "settings": [
+          {
+            "type": "header",
+            "content": "Size chart"
+          },
+          {
+            "type": "checkbox",
+            "id": "size_chart_enabled",
+            "label": "Show size chart",
+            "default": false
+          },
+          {
+            "type": "text",
+            "id": "size_chart_option_name",
+            "label": "Option name",
+            "default": "Size",
+            "info": "Enter the product option name. The size chart link will sit below this product option."
+          },
+          {
+            "type": "page",
+            "id": "size_chart_page_id",
+            "label": "Select page"
+          }
+        ]
+      },
+      {
+        "type": "vendor",
+        "name": "Vendor",
+        "limit": 1
+      }
+    ]
+  }
+{% endschema %}
